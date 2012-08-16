@@ -5,7 +5,7 @@ module ActiveRecord
   ###
   # In order to made the model Translatable, an additional fields should
   # should be added first to it. Here is an example of it might be implemented:
-  #
+  # 
   # Examples:
   #
   #   class Author < ActiveRecord::Base

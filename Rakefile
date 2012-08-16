@@ -17,8 +17,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "translatable"
   gem.homepage = "http://github.com/kot-begemot/translatable"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{An esay way to manage the translations for datamapper}
+  gem.description = %Q{This game was build to make whole proccess of working with translation for DM to be almost invisble. That was THE AIM.}
   gem.email = "max@studentify.nl"
   gem.authors = ["E-Max"]
   # dependencies defined in Gemfile
@@ -32,22 +32,8 @@ Rake::TestTask.new(:test) do |test|
   test.verbose = true
 end
 
-require 'rcov/rcovtask'
-Rcov::RcovTask.new do |test|
-  test.libs << 'test'
-  test.pattern = 'test/**/test_*.rb'
-  test.verbose = true
-  test.rcov_opts << '--exclude "gems/*"'
-end
-
 task :default => :test
 
-require 'rdoc/task'
-Rake::RDocTask.new do |rdoc|
-  version = File.exist?('VERSION') ? File.read('VERSION') : ""
+require 'yard'
+YARD::Rake::YardocTask.new
 
-  rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = "translatable #{version}"
-  rdoc.rdoc_files.include('README*')
-  rdoc.rdoc_files.include('lib/**/*.rb')
-end

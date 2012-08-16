@@ -1,14 +1,113 @@
-= translatable
+== Translatable
 
-Description goes here.
+{<img src="https://secure.travis-ci.org/kot-begemot/translatable.png" />}[http://travis-ci.org/kot-begemot/translatable]
+
+Whenever you have to deal with multilingual project, where users may fill the post
+in different languages, or you have to provide the content in the same way, this
+gem will save your day.
+This is ActiveRecord version.
+
+== What it does?
+
+This gem interferes heavily with I18n.
+First you need to do is to define the model that accepts multilingual context (there
+might me more than one of them). There you have to specify the fields that are translatable
+and some other details.
+Well,that is pretty much it. Now you can create a model with translations, and
+switching current locale you will get different translations.
+If there is no translation available, you will get nil.
+
+Check out the examples below.
+
+== Examples
+
+  Migrations:
+
+    class CreateTables < ActiveRecord::Migration
+      def up
+        create_table(:authors) do |t|
+          t.string :name, :null => false
+
+          t.timestamps
+        end
+
+        create_table(:translatable_news) do |t|
+          t.string :title, :null => false
+          t.string :content, :null => false
+          t.integer :origin_id, :null => false
+          t.string :locale, :null => false, :limit => 2
+
+          t.timestamps
+        end
+
+        create_table(:news) do |t|
+          t.integer :author_id
+
+          t.timestamps
+        end
+      end
+
+      def down
+        drop_table(:authors)
+        drop_table(:translatable_news)
+        drop_table(:news)
+      end
+    end
+
+  Models:
+
+    class Author < ActiveRecord::Base
+      validates :name, :presence => true
+    end
+
+    class TranslatableNews < ActiveRecord::Base
+      validates :title, :content, :presence => true
+      validates :title, :uniqueness => true
+
+      attr_accessible :title, :content
+    end
+
+    class News < ActiveRecord::Base
+
+      belongs_to  :author
+
+      is :translatable do
+        translatable  :title
+        translatable  :content
+        translatable_model TranslatedNews
+        translatable_origin :origin_id
+      end
+
+      attr_accessible :author_id, :author
+    end
+
+ An example of application:
+
+    news = News.create :translations => [{title: "Resent News", content: "That is where the text goes", locale: "en"}]
+    news.translations.create title: "Заголовок", content: "Содержание",locale: "ru"
+
+    news.content
+    # => "That is where the text goes"
+
+    ::I18n.locale = "ru"
+    news.content
+    # => "Сюди идет текст"
+
+    ::I18n.locale = "de"
+    news.content
+    # => nil
+
+    ::I18n.locale = ::I18n.default_locale
+    news.content
+    # => "That is where the text goes"
 
 == Contributing to translatable
  
-* Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet.
-* Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it.
-* Fork the project.
-* Start a feature/bugfix branch.
-* Commit and push until you are happy with your contribution.
+* Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
+* Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it
+* Fork the project
+* Start a feature/bugfix branch
+* Commit and push until you are happy with your contribution
 * Make sure to add tests for it. This is important so I don't break it in a future version unintentionally.
 * Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.
 

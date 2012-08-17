@@ -12,10 +12,7 @@ module ActiveRecord
   #     validates :name, :presence => true
   #   end
   #
-  #   class TranslatableNews < ActiveRecord::Base
-  #     validates :title, :content, :presence => true
-  #     validates :title, :uniqueness => true
-  #
+  #   class TranslatableNews < ActiveRecord::Base  #
   #     attr_accessible :title, :content
   #   end
   #
@@ -23,10 +20,10 @@ module ActiveRecord
   #
   #     belongs_to  :author
   #
-  #     is :translatable do
-  #       translatable  :title
-  #       translatable  :content
-  #       translatable_model TranslatedNews
+  #     translatable do
+  #       translatable  :title, :presence => true, :uniqueness => true
+  #       translatable  :content, :presence => true
+  #       translatable_model "TranslatedNews"
   #       translatable_origin :origin_id
   #     end
   #
@@ -193,6 +190,14 @@ module ActiveRecord
 
           attr_accessible :#{@translatable[:locale]}, :#{@translatable[:origin]}_id
         RUBY
+
+        @translatable[:properties].each do |p|
+          if p.size > 1
+            @translatable[:model].module_eval <<-RUBY, __FILE__, __LINE__ + 1
+              validates :#{p.first}, #{p.last.inspect}
+            RUBY
+          end
+        end
       end
     end
 

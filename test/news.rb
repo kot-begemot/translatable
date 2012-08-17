@@ -1,7 +1,7 @@
 require 'active_record'
 require 'translatable'
 
-class CreateTables < ActiveRecord::Migration
+class CreateNewsTables < ActiveRecord::Migration
   def up
     create_table(:authors) do |t|
       t.string :name, :null => false
@@ -32,7 +32,7 @@ class CreateTables < ActiveRecord::Migration
   end
 end
 
-CreateTables.migrate(:up)
+CreateNewsTables.migrate(:up)
 
 class Author < ActiveRecord::Base
   validates :name, :presence => true

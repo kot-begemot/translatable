@@ -19,9 +19,67 @@ If there is no translation available, you will get nil.
 
 Check out the examples below.
 
+== How to use?
+
+Just define inside of your model `translatable` with block.
+Block accepts following methods:
+
+  translatable *args
+    Params:
+      first - Here should be specified an attribute that will be translated.
+      second - Define here a hash that will be later provided for validation to model.
+
+      This method may be called multiple times.
+    Examples:
+      translatable :title,   :presence => true, :uniqueness => true
+      translatable :content, :presence => true
+      translatable :notes
+
+  translatable_model model_name
+    Params:
+      model_name - Define the model name here if it is different from following "Translatable<CURRENT_MODEL>".
+        For News model, TranslatableNews will be used as the one that keeping translations. It can be defined 
+        in a three ways: as constant, string or symbol.
+    Examples:
+      translatable_model TranslatedNews
+      OR
+      translatable_model "TranslatedNews"
+      OR
+      translatable_model :TranslatedNews
+
+  translatable_origin origin_key
+    Params:
+      origin_key - This key will be used to define the the relations for translations model.
+      By default it will be :origin. Translations model should also have such attribute defined.
+
+      This value will also be used for validation, as its presence is compulsory for translations model.
+    Examples:
+      translatable_origin :message
+      OR
+      translatable_origin :post
+
+  translatable_locale locale_attr
+    Params:
+      locale_attr - This key will be used to define the attribute that is keeping the locale of the translation.
+      By default it will be :locale. Translations model should also have such attribute defined.
+
+      This value will also be used for validation, as its presence is compulsory for translations model.
+    Examples:
+      translatable_locale :language
+      OR
+      translatable_locale :lang
+
+== Now to create the translations?
+
+ They can be created in two different ways:
+
+First is using the original model. Just provide the translations attributes within `translations_attributes` array.
+Second - just create a new translation as if it would be independent model.
+For details see Examples below.
+
 == Examples
 
-  Migrations:
+Migrations:
 
     class CreateTables < ActiveRecord::Migration
       def up
@@ -54,16 +112,13 @@ Check out the examples below.
       end
     end
 
-  Models:
+Models:
 
     class Author < ActiveRecord::Base
       validates :name, :presence => true
     end
 
     class TranslatableNews < ActiveRecord::Base
-      validates :title, :content, :presence => true
-      validates :title, :uniqueness => true
-
       attr_accessible :title, :content
     end
 
@@ -71,19 +126,19 @@ Check out the examples below.
 
       belongs_to  :author
 
-      is :translatable do
-        translatable  :title
-        translatable  :content
-        translatable_model TranslatedNews
+      translatable do
+        translatable  :title, :presence => true, :uniqueness => true
+        translatable  :content, :presence => true
+        translatable_model "TranslatedNews"
         translatable_origin :origin_id
       end
 
       attr_accessible :author_id, :author
     end
 
- An example of application:
+An example of application:
 
-    news = News.create :translations => [{title: "Resent News", content: "That is where the text goes", locale: "en"}]
+    news = News.create :translations_attributes => [{title: "Resent News", content: "That is where the text goes", locale: "en"}]
     news.translations.create title: "Заголовок", content: "Содержание",locale: "ru"
 
     news.content

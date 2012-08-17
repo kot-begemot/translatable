@@ -1,6 +1,7 @@
 # encoding: utf-8
 require 'helper'
 require 'news'
+require 'posts'
 
 class TestDmTranslatable < Test::Unit::TestCase
 
@@ -184,5 +185,37 @@ class TestDmTranslatable < Test::Unit::TestCase
     news.translations.each do |t|
       assert t.new_record?
     end
+  end
+
+  def test_validations_are_defined
+    post = Post.create :translations_attributes => [{:title => "Заголовок",:content => "Содержание", :locale => "ru"},
+      {:title => "Resent Post", :content => "That is where the text goes", :locale => "en"}]
+    assert post.persisted?, "Message had errors: #{post.errors.inspect}"
+
+    post = Post.create :translations_attributes => [{:content => "Содержание", :locale => "ru"},
+      {:title => "Resent Post 2", :content => "That is where the text goes", :locale => "en"}]
+    
+    assert post.new_record?, "Message had errors: #{post.errors.full_messages.inspect}"
+    assert_equal ["Translations title can't be blank"], post.errors.full_messages
+
+    post = Post.create :translations_attributes => [{:title => "Заголовок 2", :locale => "ru"},
+      {:title => "Resent Post 3", :content => "That is where the text goes", :locale => "en"}]
+
+    assert post.new_record?, "Message had errors: #{post.errors.full_messages.inspect}"
+    assert_equal ["Translations content can't be blank"], post.errors.full_messages
+
+    post = Post.create :translations_attributes => [{:title => "Заголовок", :content => "Содержание", :locale => "ru"},
+      {:title => "Resent Post 3", :content => "That is where the text goes", :locale => "en"}]
+
+    assert post.new_record?, "Message had errors: #{post.errors.full_messages.inspect}"
+    assert_equal ["Translations title has already been taken"], post.errors.full_messages
+  end
+
+  def test_origin_is_owerwrittent
+    post = Post.create :translations_attributes => [{:title => "Заголовок",:content => "Содержание", :locale => "ru"},
+      {:title => "Resent Post", :content => "That is where the text goes", :locale => "en"}]
+    assert post.persisted?, "Message had errors: #{post.errors.inspect}"
+
+    assert_equal post, post.translations.first.post
   end
 end

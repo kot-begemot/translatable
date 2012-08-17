@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["E-Max"]
-  s.date = "2012-08-16"
+  s.date = "2012-08-17"
   s.description = "This game was build to make whole proccess of working with translation for DM to be almost invisble. That was THE AIM."
   s.email = "max@studentify.nl"
   s.extra_rdoc_files = [
@@ -18,14 +18,21 @@ Gem::Specification.new do |s|
   ]
   s.files = [
     ".document",
+    ".rvmrc",
+    ".travis.yml",
     "Gemfile",
+    "Gemfile.lock",
     "LICENSE.txt",
     "README.rdoc",
     "Rakefile",
     "VERSION",
     "lib/translatable.rb",
     "test/helper.rb",
-    "test/test_translatable.rb"
+    "test/news.rb",
+    "test/support/active_record.rb",
+    "test/support/database_cleaner.rb",
+    "test/test_translatable.rb",
+    "translatable.gemspec"
   ]
   s.homepage = "http://github.com/kot-begemot/translatable"
   s.licenses = ["MIT"]

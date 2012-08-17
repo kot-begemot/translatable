@@ -3,18 +3,20 @@ source "http://rubygems.org"
 gem "activerecord"
 gem "i18n"
 
-group :development, :test do
+group :development do
+  gem "yard"
+  gem "jeweler", ">= 1.6.0"
+  gem "bundler", ">= 1.0.0"
+  gem "simplecov", ">= 0.6.0", :platform => :ruby_19
+  gem "rcov", ">= 1.0.0", :platform => :ruby_18
+end
+
+group :test do
   gem "test-spec"
-  gem "yard", "~> 0.6.0"
-  gem "bundler", "~> 1.0.0"
-  gem "jeweler", "~> 1.6.4"
 
   gem "debugger", "~> 1.1.3", :platform => :ruby_19
-  gem "simplecov", "~> 0.6.4", :platform => :ruby_19
-
   gem 'ruby-debug', :platform => :ruby_18
-  gem "rcov", "~> 1.0.0", :platform => :ruby_18
 
-  gem "database_cleaner", "~> 0.7.2"
-  gem "sqlite3", "~> 1.3.6"
+  gem "database_cleaner"
+  gem "sqlite3"
 end

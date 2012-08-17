@@ -1,6 +1,6 @@
 source "http://rubygems.org"
 
-gem "activerecord", "~> 3.1.0"
+gem "activerecord"
 gem "i18n"
 
 group :development, :test do

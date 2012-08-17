@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = "translatable"
-  s.version = "0.1.1"
+  s.version = "0.1.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["E-Max"]
@@ -29,6 +29,7 @@ Gem::Specification.new do |s|
     "lib/translatable.rb",
     "test/helper.rb",
     "test/news.rb",
+    "test/posts.rb",
     "test/support/active_record.rb",
     "test/support/database_cleaner.rb",
     "test/test_translatable.rb",

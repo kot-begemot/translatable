@@ -173,11 +173,17 @@ module ActiveRecord
           def current_translation
             if translatable_locale_changed?
               @translatable_locale = ::I18n.locale.to_s
-              @current_translation = translations.where(:#{@translatable[:locale]} => @translatable_locale).first
+              translatable_set_current
             end
             @current_translation
           end
           protected :current_translation
+
+
+          def translatable_set_current
+            @current_translation = translations.where(:#{@translatable[:locale]} => @translatable_locale).first
+          end
+          protected :translatable_set_current
         RUBY
       end
 

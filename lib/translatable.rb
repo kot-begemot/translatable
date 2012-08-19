@@ -190,6 +190,7 @@ module ActiveRecord
       def translatable_register_properties_for_translatable
         @translatable[:model].module_eval <<-RUBY, __FILE__, __LINE__ + 1
           validates :#{@translatable[:locale]}, :presence => true
+          validates :#{@translatable[:locale]}, :format => { :with => /[a-z]{2}/}, :if => Proc.new {|record| !record.#{@translatable[:locale]}.blank? }
           validates :#{@translatable[:locale]}, :uniqueness => { :scope => :#{@translatable[:origin]}_id }
 
           belongs_to :#{@translatable[:origin]}, :class_name => "#{self.name}"

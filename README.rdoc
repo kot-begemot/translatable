@@ -17,6 +17,9 @@ Well,that is pretty much it. Now you can create a model with translations, and
 switching current locale you will get different translations.
 If there is no translation available, you will get nil.
 
+Meanwhile, it validates that the :original_id and :locale are presented, :locale has correct format (two lower letters) and
+verifies that :locale in unique within :original_id scope.
+
 Check out the examples below.
 
 == How to use?

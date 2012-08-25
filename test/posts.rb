@@ -60,6 +60,7 @@ class Post < ActiveRecord::Base
     translatable  :content, :presence => true
     translatable_model 'TranslatedPost'
     translatable_origin :post
+    translatable_attr_accessible
   end
 
   attr_accessible :writer_id, :writer

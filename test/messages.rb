@@ -41,6 +41,7 @@ end
 
 class TranslatedMessage < ActiveRecord::Base
   attr_accessible :title, :content
+  attr_accessible :title, :content, :locale, :as => :editor
 
   before_validation :set_default_locale, :if => :writer_id
   before_create :duplicate_writer_id, :unless => :writer_id
@@ -65,7 +66,6 @@ class Message < ActiveRecord::Base
     translatable  :content, :presence => true
     translatable_model 'TranslatedMessage'
     translatable_origin :message
-    translatable_attr_protected
   end
 
   attr_accessible :writer_id, :writer

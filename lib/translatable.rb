@@ -118,7 +118,21 @@ module ActiveRecord
       # Default: false
       #
       def translatable_attr_protected
-        @translatable[:attr_protected] = true
+        @translatable[:attr_accessible] = false
+      end
+
+      ###
+      # Will not register the attributes as accessible.
+      # IMPORTANT: Translatable block will be evaluated on the model after it
+      # was loaded, so it will modify certain thing on final version. Hence this thing is needed.
+      # Examples:
+      #
+      #   translatable_attr_protected
+      #
+      # Default: false
+      #
+      def translatable_attr_accessible
+        @translatable[:attr_accessible] = true
       end
 
       ###
@@ -208,9 +222,13 @@ module ActiveRecord
           validates :#{@translatable[:locale]}, :uniqueness => { :scope => :#{@translatable[:origin]}_id }
 
           belongs_to :#{@translatable[:origin]}, :class_name => "#{self.name}"
-
-          attr_#{!!@translatable[:attr_protected] ? "protected" : "accessible" } :#{@translatable[:locale]}, :#{@translatable[:origin]}_id
         RUBY
+
+        unless @translatable[:attr_accessible].nil?
+          @translatable[:model].module_eval <<-RUBY, __FILE__, __LINE__ + 1
+            attr_#{!!@translatable[:attr_accessible] ? "accessible" : "protected" } :#{@translatable[:locale]}, :#{@translatable[:origin]}_id
+          RUBY
+        end
 
         @translatable[:properties].each do |p|
           if p.size > 1

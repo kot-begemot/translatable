@@ -72,9 +72,10 @@ Block accepts following methods:
       OR
       translatable_locale :lang
 
+  translatable_attr_accessible
   translatable_attr_protected
-    If this line is set then the attributes :locale and :origin will be protected from
-    mass-assigment, otherwise they will be available.
+    If this line is set then the attributes :locale and :origin will be allowed or protected
+    from for mass-assigment.
 
     Note: Note sure that this is the best implementation. Would appreciate any better ideas.
 
@@ -140,6 +141,7 @@ Models:
         translatable  :content, :presence => true
         translatable_model "TranslatedNews"
         translatable_origin :origin_id
+        translatable_attr_accessible
       end
 
       attr_accessible :author_id, :author

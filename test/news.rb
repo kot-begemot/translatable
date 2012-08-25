@@ -52,6 +52,7 @@ class News < ActiveRecord::Base
   translatable do
     translatable  :title
     translatable  :content
+    translatable_attr_accessible
   end
 
   attr_accessible :author_id, :author

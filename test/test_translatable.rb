@@ -229,6 +229,15 @@ class TestDmTranslatable < Test::Unit::TestCase
     assert_equal nil, tm.message_id
   end
 
+  def test_protected_editor_mass_assigment
+    tm = TranslatedMessage.new( {:title => "Resent Post", :content => "That is where the text goes", :locale => "en", :message_id => 1}, :as => :editor)
+
+    assert_equal "Resent Post", tm.title
+    assert_equal "That is where the text goes", tm.content
+    assert_equal "en", tm.locale
+    assert_equal nil, tm.message_id
+  end
+
   def test_accessible_mass_assigment
     tp = TranslatableNews.new( :title => "Resent News", :content => "That is where the text goes", :locale => "en", :origin_id => 1)
 

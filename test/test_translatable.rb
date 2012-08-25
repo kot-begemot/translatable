@@ -2,6 +2,7 @@
 require 'helper'
 require 'news'
 require 'posts'
+require 'messages'
 
 class TestDmTranslatable < Test::Unit::TestCase
 
@@ -217,5 +218,23 @@ class TestDmTranslatable < Test::Unit::TestCase
     assert post.persisted?, "Message had errors: #{post.errors.inspect}"
 
     assert_equal post, post.translations.first.post
+  end
+
+  def test_protected_mass_assigment
+    tm = TranslatedMessage.new( :title => "Resent Post", :content => "That is where the text goes", :locale => "en", :message_id => 1)
+
+    assert_equal "Resent Post", tm.title
+    assert_equal "That is where the text goes", tm.content
+    assert_equal nil, tm.locale
+    assert_equal nil, tm.message_id
+  end
+
+  def test_accessible_mass_assigment
+    tp = TranslatableNews.new( :title => "Resent News", :content => "That is where the text goes", :locale => "en", :origin_id => 1)
+
+    assert_equal "Resent News", tp.title
+    assert_equal "That is where the text goes", tp.content
+    assert_equal "en", tp.locale
+    assert_equal 1, tp.origin_id
   end
 end

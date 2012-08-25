@@ -1,7 +1,7 @@
 require 'active_record'
 require 'translatable'
 
-class CreatePostsTables < ActiveRecord::Migration
+class CreateMessagesTables < ActiveRecord::Migration
   def up
     create_table(:writers, :force => true) do |t|
       t.string :name, :null => false
@@ -9,17 +9,17 @@ class CreatePostsTables < ActiveRecord::Migration
       t.timestamps
     end
 
-    create_table(:translated_posts) do |t|
+    create_table(:translated_messages) do |t|
       t.string :title, :null => false
       t.string :content, :null => false
-      t.integer :post_id, :null => false
+      t.integer :message_id, :null => false
       t.string :locale, :null => false, :limit => 2
       t.integer :writer_id
 
       t.timestamps
     end
 
-    create_table(:posts) do |t|
+    create_table(:messages) do |t|
       t.integer :writer_id
 
       t.timestamps
@@ -28,38 +28,44 @@ class CreatePostsTables < ActiveRecord::Migration
 
   def down
     drop_table(:writers)
-    drop_table(:translated_posts)
-    drop_table(:posts)
+    drop_table(:translated_messages)
+    drop_table(:messages)
   end
 end
 
-CreatePostsTables.migrate(:up)
+CreateMessagesTables.migrate(:up)
 
 class Author < ActiveRecord::Base
   validates :name, :presence => true
 end
 
-class TranslatedPost < ActiveRecord::Base
+class TranslatedMessage < ActiveRecord::Base
   attr_accessible :title, :content
 
-  before_create :duplicate_writer_id
+  before_validation :set_default_locale, :if => :writer_id
+  before_create :duplicate_writer_id, :unless => :writer_id
 
   protected
 
+  def set_default_locale
+    self.locale ||= ::I18n.locale
+  end
+
   def duplicate_writer_id
-    self.writer_id = post.writer_id
+    self.writer_id = message.writer_id
   end
 end
 
-class Post < ActiveRecord::Base
+class Message < ActiveRecord::Base
 
   belongs_to  :writer
 
   translatable do
     translatable  :title, :presence => true, :uniqueness => true
     translatable  :content, :presence => true
-    translatable_model 'TranslatedPost'
-    translatable_origin :post
+    translatable_model 'TranslatedMessage'
+    translatable_origin :message
+    translatable_attr_protected
   end
 
   attr_accessible :writer_id, :writer

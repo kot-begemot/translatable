@@ -108,6 +108,20 @@ module ActiveRecord
       end
 
       ###
+      # Will not register the attributes as accessible.
+      # IMPORTANT: Translatable block will be evaluated on the model after it
+      # was loaded, so it will modify certain thing on final version. Hence this thing is needed.
+      # Examples:
+      #
+      #   translatable_attr_protected
+      #
+      # Default: false
+      #
+      def translatable_attr_protected
+        @translatable[:attr_protected] = true
+      end
+
+      ###
       # Define the key that the translation will be used for belongs_to association,
       # to communicate with original model
       # Example:
@@ -195,7 +209,7 @@ module ActiveRecord
 
           belongs_to :#{@translatable[:origin]}, :class_name => "#{self.name}"
 
-          attr_accessible :#{@translatable[:locale]}, :#{@translatable[:origin]}_id
+          attr_#{!!@translatable[:attr_protected] ? "protected" : "accessible" } :#{@translatable[:locale]}, :#{@translatable[:origin]}_id
         RUBY
 
         @translatable[:properties].each do |p|

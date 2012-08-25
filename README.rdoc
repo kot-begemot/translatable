@@ -72,6 +72,12 @@ Block accepts following methods:
       OR
       translatable_locale :lang
 
+  translatable_attr_protected
+    If this line is set then the attributes :locale and :origin will be protected from
+    mass-assigment, otherwise they will be available.
+
+    Note: Note sure that this is the best implementation. Would appreciate any better ideas.
+
 == Now to create the translations?
 
  They can be created in two different ways:

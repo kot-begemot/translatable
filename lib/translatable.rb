@@ -190,8 +190,9 @@ module ActiveRecord
         attr_accessible :translations_attributes
 
         @translatable[:properties].each do |p|
+          accessible_as = (p.last.delete(:as) || p.first rescue p.first)
           self.module_eval <<-RUBY, __FILE__, __LINE__ + 1
-            def #{p.first}
+            def #{accessible_as}
               current_translation.try(:#{p.first})
             end
           RUBY

@@ -220,6 +220,18 @@ class TestDmTranslatable < Test::Unit::TestCase
     assert_equal post, post.translations.first.post
   end
 
+  def test_attr_as
+    post = Post.create :translations_attributes => [{:title => "Заголовок",:content => "Содержание", :locale => "ru"},
+      {:title => "Resent Post", :content => "That is where the text goes", :locale => "en"}]
+    assert post.persisted?, "Message had errors: #{post.errors.inspect}"
+
+    assert_equal "Resent Post", post.translated_title
+
+    ::I18n.locale = :ru
+    assert_equal "Заголовок", post.translated_title
+    ::I18n.locale = ::I18n.default_locale
+  end
+
   def test_protected_mass_assigment
     tm = TranslatedMessage.new( :title => "Resent Post", :content => "That is where the text goes", :locale => "en", :message_id => 1)
 

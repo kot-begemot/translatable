@@ -56,7 +56,7 @@ class Post < ActiveRecord::Base
   belongs_to  :writer
 
   translatable do
-    translatable  :title, :presence => true, :uniqueness => true
+    translatable  :title, :as => :translated_title, :presence => true, :uniqueness => true
     translatable  :content, :presence => true
     translatable_model 'TranslatedPost'
     translatable_origin :post

@@ -91,6 +91,18 @@ class TestDmTranslatable < Test::Unit::TestCase
     assert_equal "ru", t_news.locale
   end
 
+  def test_no_other_translations
+    news = News.create :translations_attributes => [{ :title => "Заголовок", :content => "Содержание", :locale => "ru"}]
+
+    assert news.persisted?
+
+    t_news = TranslatableNews.last
+    assert_equal [t_news], news.other_translations
+    ::I18n.locale = :ru
+     assert_equal [], news.other_translations
+    ::I18n.locale = ::I18n.default_locale
+  end
+
   def test_create_with_translation_with_multiple_locales
     news = News.create :translations_attributes => [{ :title => "Заголовок", :content => "Содержание", :locale => "ru"},
       {:title => "Resent News", :content => "That is where the text goes", :locale => "en"}]
@@ -120,7 +132,7 @@ class TestDmTranslatable < Test::Unit::TestCase
     assert_equal "That is where the text goes", news.content
   end
 
-  def test_access_of_other_translation
+  def test_access_of_different_translation
     news = News.create :translations_attributes => [{:title => "Заголовок", :content => "Содержание", :locale => "ru"},
       {:title => "Resent News", :content => "That is where the text goes", :locale => "en"}]
 

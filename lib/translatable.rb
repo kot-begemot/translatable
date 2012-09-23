@@ -199,16 +199,6 @@ module ActiveRecord
         end
 
         self.module_eval <<-RUBY, __FILE__, __LINE__ + 1
-          def current_translation
-            if translatable_locale_changed?
-              @translatable_locale = ::I18n.locale.to_s
-              translatable_set_current
-            end
-            @current_translation
-          end
-          protected :current_translation
-
-
           def translatable_set_current
             @current_translation = translations.where(:#{@translatable[:locale]} => @translatable_locale).first
           end
@@ -243,8 +233,20 @@ module ActiveRecord
 
     module InstanceMethods
 
-      protected
+      def current_translation
+        if translatable_locale_changed?
+          @translatable_locale = ::I18n.locale.to_s
+          translatable_set_current
+        end
+        @current_translation
+      end
 
+      def other_translations
+        translations - [current_translation]
+      end
+
+      protected
+      
       def translatable_locale_changed?
         @translatable_locale.to_s != ::I18n.locale.to_s
       end

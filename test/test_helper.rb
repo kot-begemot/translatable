@@ -1,9 +1,13 @@
-require 'rubygems'
 require 'bundler'
-if RUBY_VERSION >= '1.9.0'
-  require "debugger"
-else
-  require 'ruby-debug'
+require 'test/unit'
+require "shoulda-context"
+require "i18n"
+
+begin
+  require 'simplecov'
+  SimpleCov.start
+rescue LoadError
+  $stderr.puts "Simplecov is skipped"
 end
 
 begin
@@ -13,7 +17,6 @@ rescue Bundler::BundlerError => e
   $stderr.puts "Run `bundle install` to install missing gems"
   exit e.status_code
 end
-require 'test/unit'
 
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
@@ -24,4 +27,13 @@ require File.expand_path("support/database_cleaner", File.dirname(__FILE__))
 
 class Test::Unit::TestCase
   include OrmSetup
+
+  setup do
+    before_setup
+    ::I18n.locale = ::I18n.default_locale
+  end
+
+  teardown do
+    after_teardown
+  end
 end

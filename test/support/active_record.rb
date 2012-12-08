@@ -5,4 +5,7 @@ ActiveRecord::Base.establish_connection(
   :database => ':memory:'
 )
 
-ActiveRecord::Base.logger = Logger.new(STDOUT)
+ActiveRecord::Migration.verbose = $VERBOSE
+if $VERBOSE
+  ActiveRecord::Base.logger = Logger.new(STDOUT)
+end

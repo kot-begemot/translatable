@@ -28,12 +28,16 @@ Jeweler::RubygemsDotOrgTasks.new
 require 'rake/testtask'
 Rake::TestTask.new(:test) do |test|
   test.libs << 'lib' << 'test'
-  test.pattern = 'test/**/test_*.rb'
+  test.pattern = 'test/**/*_test.rb'
   test.verbose = true
 end
 
 task :default => :test
 
-require 'yard'
-YARD::Rake::YardocTask.new
+begin
+  require 'yard'
+  YARD::Rake::YardocTask.new
+rescue LoadError
+  $stderr.puts "Skipping Yard tasks"
+end
 

@@ -1,14 +1,15 @@
+require "translatable/generator_helper"
+
 module Translatable
   module Generators
     class ModelGenerator < Rails::Generators::NamedBase
-      attr_accessor :attributes
-      argument :attrs, type: :array, default: [], banner: "field[:type][:index] field[:type][:index]"
+      include Translatable::GeneratorHelper
 
       desc "Creates ActiveRecord model and injects translatable block into it"
 
-      class_option :translated_model, :type => :string, :desc => "Add indexes for references and belongs_to columns"
-      class_option :origin,           :type => :string, :desc => "Add indexes for references and belongs_to columns"
-      class_option :locale,           :type => :string, :desc => "Add indexes for references and belongs_to columns"
+      class_option :translated_model, :type => :string, :desc => "Defines the model responsible for translations"
+      class_option :origin,           :type => :string, :desc => "Defines the association name for translation record that deals with origin"
+      class_option :locale,           :type => :string, :desc => "Defines the column for translation record that keeps the locale"
 
       def create_model
         self.attributes = attrs
@@ -38,14 +39,6 @@ module Translatable
             "\n    #translatable_locale :locale" :
             "\n    translatable_locale :#{options[:locale]}")
         block << "\n  end\n"
-      end
-
-      def model_path
-        File.join(destination_root, 'app/models', class_path, "#{file_name}.rb")
-      end
-
-      def model_exists?
-        File.exists?(model_path)
       end
     end
   end

@@ -1,14 +1,15 @@
+require "translatable/generator_helper"
+
 module Translatable
   module Generators
     class TranslationGenerator < Rails::Generators::NamedBase
-      attr_accessor :attributes
-      argument :attrs, type: :array, default: [], banner: "field[:type][:index] field[:type][:index]"
+      include Translatable::GeneratorHelper
 
-      desc "Creates ActiveRecord model and injects translatable block into it"
+      desc "Creates ActiveRecord for translation dealer"
 
-      class_option :prefix, :type => :string, :default => "translatable", :desc => "Add indexes for references and belongs_to columns"
-      class_option :origin, :type => :string, :default => "origin",       :desc => "Add indexes for references and belongs_to columns"
-      class_option :locale, :type => :string, :default => "locale",       :desc => "Add indexes for references and belongs_to columns"
+      class_option :prefix, :type => :string, :default => "translatable", :desc => "Specifies the prefix to used tof translation dealer (Default: translatable)"
+      class_option :origin, :type => :string, :default => "origin",       :desc => "Specifies the association name to be use for origin (Default: origin)"
+      class_option :locale, :type => :string, :default => "locale",       :desc => "Specifies the column to be use for locale (Default: locale)"
 
       def create_model
         self.attributes = attrs
@@ -30,23 +31,15 @@ module Translatable
   # In later gem version its existance might not be necessary.
 CONTENT
         unless attributes.empty?
-        block << "  attr_accessible :#{attributes.map(&:name).join(", :")}\n"
+          block << "  attr_accessible :#{attributes.map(&:name).join(", :")}\n"
+        end
+        block << "  #attr_protected :#{options[:origin]}_id, :#{options[:locale]}\n"
+        block
       end
-      block << "  #attr_protected :#{options[:origin]}_id, :#{options[:locale]}\n"
-      block
-    end
 
-    def file_name
-      "#{options[:prefix].downcase}_#{@file_name}"
-    end
-
-    def model_path
-      File.join(destination_root, 'app/models', class_path, "#{file_name}.rb")
-    end
-
-    def model_exists?
-      File.exists?(model_path)
+      def file_name
+        "#{options[:prefix].downcase}_#{@file_name}"
+      end
     end
   end
-end
 end

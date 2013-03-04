@@ -200,7 +200,11 @@ module ActiveRecord
 
         self.module_eval <<-RUBY, __FILE__, __LINE__ + 1
           def translatable_set_current
-            @current_translation = translations.where(:#{@translatable[:locale]} => @translatable_locale).first
+            @current_translation = if translations.loaded?
+              translations.select { |t| t.send(:"#{@translatable[:locale]}") == @translatable_locale }
+            else
+              translations.where(:"#{@translatable[:locale]}" => @translatable_locale)
+            end.first
           end
           protected :translatable_set_current
         RUBY

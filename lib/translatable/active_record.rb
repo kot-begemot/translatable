@@ -199,10 +199,15 @@ module Translatable
         end
 
         self.module_eval <<-RUBY, __FILE__, __LINE__ + 1
-          def translatable_set_current
-            @current_translation = translations.where(:#{@translatable[:locale]} => @translatable_locale).first
+          def translatable_set_current(locale = ::I18n.locale)
+            locale = locale.to_s
+            @current_translation = if translations.loaded?
+              translations.select { |t| t.send(:"#{@translatable[:locale]}") == locale }
+            else
+              translations.where(:"#{@translatable[:locale]}" => locale)
+            end.first
           end
-          protected :translatable_set_current
+          alias_method :set_current_translation, :translatable_set_current
         RUBY
       end
 
@@ -232,23 +237,17 @@ module Translatable
     end
 
     module InstanceMethods
-
       def current_translation
-        if translatable_locale_changed?
-          @translatable_locale = ::I18n.locale.to_s
-          translatable_set_current
-        end
+        update_current_translation unless @translatable_locale
         @current_translation
+      end
+
+      def update_current_translation
+        translatable_set_current(@translatable_locale = ::I18n.locale.to_s)
       end
 
       def other_translations
         translations - [current_translation]
-      end
-
-      protected
-      
-      def translatable_locale_changed?
-        @translatable_locale.to_s != ::I18n.locale.to_s
       end
     end
   end

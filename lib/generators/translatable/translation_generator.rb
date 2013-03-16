@@ -5,7 +5,7 @@ module Translatable
     class TranslationGenerator < Rails::Generators::NamedBase
       include Translatable::GeneratorHelper
 
-      desc "Creates ActiveRecord for translation dealer"
+      desc "Creates ActiveRecord for translation"
 
       class_option :prefix, :type => :string, :default => "translatable", :desc => "Specifies the prefix to used tof translation dealer (Default: translatable)"
       class_option :origin, :type => :string, :default => "origin",       :desc => "Specifies the association name to be use for origin (Default: origin)"
@@ -30,9 +30,9 @@ module Translatable
   # should be avoided.
   # In later gem version its existance might not be necessary.
 CONTENT
-        unless attributes.empty?
-          block << "  attr_accessible :#{attributes.map(&:name).join(", :")}\n"
-        end
+        # unless attributes.empty?
+        #   block << "  attr_accessible :#{attributes.map(&:name).join(", :")}\n"
+        # end
         block << "  #attr_protected :#{options[:origin]}_id, :#{options[:locale]}\n"
         block
       end

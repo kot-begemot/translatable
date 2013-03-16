@@ -5,7 +5,10 @@ require "i18n"
 
 begin
   require 'simplecov'
-  SimpleCov.start
+  SimpleCov.start do
+    add_filter "/test/"
+    add_filter "/vendor/"
+  end
 rescue LoadError
   $stderr.puts "Simplecov is skipped"
 end
@@ -18,12 +21,18 @@ rescue Bundler::BundlerError => e
   exit e.status_code
 end
 
-$LOAD_PATH.unshift(File.dirname(__FILE__))
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'translatable'
 
 require File.expand_path("support/active_record", File.dirname(__FILE__))
 require File.expand_path("support/database_cleaner", File.dirname(__FILE__))
+
+# Test output styling
+# Turn do not want to play nicelly =(, skip it then....
+require 'turn/autorun'
+Turn.config do |c|
+  c.format  = :pretty
+  c.natural = true
+end
 
 class Test::Unit::TestCase
   include OrmSetup

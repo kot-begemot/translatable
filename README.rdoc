@@ -167,6 +167,10 @@ An example of application:
     news.content
     # => "That is where the text goes"
 
+== Testing
+
+Run the tests with `VERBOSE=true` to see SQL queries
+
 == Contributing to translatable
  
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet

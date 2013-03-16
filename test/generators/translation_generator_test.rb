@@ -16,7 +16,6 @@ class TranslatableArticle < ActiveRecord::Base
   # This class deals purely with translations themselves. Hence, any edition of
   # should be avoided.
   # In later gem version its existance might not be necessary.
-  attr_accessible :title, :content
   #attr_protected :origin_id, :locale
 end
 CONTENT
@@ -43,7 +42,6 @@ class TranslationArticle < ActiveRecord::Base
   # This class deals purely with translations themselves. Hence, any edition of
   # should be avoided.
   # In later gem version its existance might not be necessary.
-  attr_accessible :title, :content
   #attr_protected :post_id, :language
 end
 CONTENT

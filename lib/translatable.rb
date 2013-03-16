@@ -4,13 +4,15 @@ if defined?(Rails)
   require 'translatable/engine'
 
   ActiveSupport.on_load(:active_record) do
-    ActiveSupport.on_load(:i18n) do
-      ActiveRecord::Base.extend Translatable::ActiveRecord
-    end
+    ActiveRecord::Base.extend Translatable::ActiveRecord if defined?(I18n)
   end
 else
-  require 'active_record'
-  require 'i18n'
-  
-  ActiveRecord::Base.extend Translatable::ActiveRecord
+  begin 
+    require 'active_record'
+    require 'i18n'
+      
+    ActiveRecord::Base.extend Translatable::ActiveRecord
+  rescue LoadError
+    $stderr.puts "Warning: Translatable is not loaded"
+  end
 end

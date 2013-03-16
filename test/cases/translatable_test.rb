@@ -5,6 +5,10 @@ require 'support/models/posts'
 require 'support/models/messages'
 
 class TranslatableTest < Test::Unit::TestCase
+    teardown do
+      ::I18n.locale = ::I18n.default_locale
+    end
+
   context "Translatable hash" do
     should "Define default" do
       th = News.instance_variable_get :@translatable
@@ -54,9 +58,10 @@ class TranslatableTest < Test::Unit::TestCase
 
       t_news = TranslatableNews.last
       assert_equal [t_news], news.other_translations
-      ::I18n.locale = :ru
+      
+      news.set_current_translation :ru
+
       assert_equal [], news.other_translations
-      ::I18n.locale = ::I18n.default_locale
     end
 
     should "Provide errors on creation" do
@@ -154,9 +159,9 @@ class TranslatableTest < Test::Unit::TestCase
       assert news.persisted?
 
       ::I18n.locale = :ru
+
       assert_equal "Заголовок", news.title
       assert_equal "Содержание", news.content
-      ::I18n.locale = ::I18n.default_locale
     end
     
     should "Not been set if unavailable" do
@@ -164,13 +169,13 @@ class TranslatableTest < Test::Unit::TestCase
         {:title => "Resent News", :content => "That is where the text goes", :locale => "en"}]
 
       assert news.persisted?
+      news.set_current_translation :de
 
-      ::I18n.locale = :de
       assert_nil news.title
       assert_nil news.content
     end
 
-    should "Be be switched on locale switching" do
+    should "Be switched on locale switching" do
       news = News.create :translations_attributes => [{:title => "Resent News", :content => "That is where the text goes", :locale => "en"}]
 
       assert news.persisted?
@@ -183,7 +188,7 @@ class TranslatableTest < Test::Unit::TestCase
       assert_equal "Resent News", news.title
       assert_equal "That is where the text goes", news.content
 
-      ::I18n.locale = :ru
+      news.set_current_translation :ru
 
       assert_equal "Заголовок", news.title
       assert_equal "Содержание", news.content
@@ -240,9 +245,9 @@ class TranslatableTest < Test::Unit::TestCase
 
     assert_equal "Resent Post", post.translated_title
 
-    ::I18n.locale = :ru
+    post.set_current_translation :ru
+
     assert_equal "Заголовок", post.translated_title
-    ::I18n.locale = ::I18n.default_locale
   end
 
   context "Mass assigment" do

@@ -201,11 +201,8 @@ module Translatable
         self.module_eval <<-RUBY, __FILE__, __LINE__ + 1
           def translatable_set_current(locale = ::I18n.locale)
             locale = @translatable_locale = locale.to_s
-            @current_translation = if translations.loaded?
-              translations.select { |t| t.send(:"#{@translatable[:locale]}") == locale }
-            else
-              translations.where(:"#{@translatable[:locale]}" => locale)
-            end.first
+            translations.load_target unless translations.loaded?
+            @current_translation = translations.select { |t| t.send(:"#{@translatable[:locale]}") == locale }.first
           end
           alias_method :set_current_translation, :translatable_set_current
         RUBY

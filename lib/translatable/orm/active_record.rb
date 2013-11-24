@@ -120,7 +120,7 @@ module Translatable
       def with_locale(locale, &block)
         begin
           set_current_translation locale.to_sym
-          result = block.arity > 0 ? block.call(self) : instance_eval(&block)
+          result = yield
         ensure
           update_current_translation
         end

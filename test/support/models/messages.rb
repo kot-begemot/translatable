@@ -1,6 +1,3 @@
-require 'active_record'
-require 'translatable'
-
 class CreateMessagesTables < ActiveRecord::Migration
   def up
     create_table(:writers, :force => true) do |t|
@@ -9,11 +6,11 @@ class CreateMessagesTables < ActiveRecord::Migration
       t.timestamps
     end
 
-    create_table(:translated_messages) do |t|
-      t.string :title, :null => false
-      t.string :content, :null => false
-      t.integer :message_id, :null => false
-      t.string :locale, :null => false, :limit => 2
+    create_table(:message_translations) do |t|
+      t.string  :title, :null => false
+      t.string  :content, :null => false
+      t.integer :origin_id, :null => false
+      t.string  :locale, :null => false, :limit => 2
       t.integer :writer_id
 
       t.timestamps
@@ -28,7 +25,7 @@ class CreateMessagesTables < ActiveRecord::Migration
 
   def down
     drop_table(:writers)
-    drop_table(:translated_messages)
+    drop_table(:message_translations)
     drop_table(:messages)
   end
 end
@@ -39,7 +36,7 @@ class Author < ActiveRecord::Base
   validates :name, :presence => true
 end
 
-class TranslatedMessage < ActiveRecord::Base
+class MessageTranslation < ActiveRecord::Base
   attr_accessible :title, :content
   attr_accessible :title, :content, :locale, :as => :editor
 
@@ -62,10 +59,10 @@ class Message < ActiveRecord::Base
   belongs_to  :writer
 
   translatable do
-    translatable  :title, :presence => true, :uniqueness => true
-    translatable  :content, :presence => true
-    translatable_model 'TranslatedMessage'
-    translatable_origin :message
+    field  :title, :presence => true, :uniqueness => true
+    field  :content, :presence => true
+    class_name 'MessageTranslation'
+    reflection_name :message
   end
 
   attr_accessible :writer_id, :writer

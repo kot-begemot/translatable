@@ -26,14 +26,6 @@ require 'translatable'
 require File.expand_path("support/active_record", File.dirname(__FILE__))
 require File.expand_path("support/database_cleaner", File.dirname(__FILE__))
 
-# Test output styling
-# Turn do not want to play nicelly =(, skip it then....
-require 'turn/autorun'
-Turn.config do |c|
-  c.format  = :pretty
-  c.natural = true
-end
-
 class Test::Unit::TestCase
   include OrmSetup
 

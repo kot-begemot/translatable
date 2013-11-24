@@ -1,39 +1,13 @@
 # encoding: utf-8
+require 'active_record'
 require 'test_helper'
 require 'support/models/news'
 require 'support/models/posts'
 require 'support/models/messages'
 
-class TranslatableTest < Test::Unit::TestCase
-    teardown do
-      ::I18n.locale = ::I18n.default_locale
-    end
-
-  context "Translatable hash" do
-    should "Define default" do
-      th = News.instance_variable_get :@translatable
-
-      assert_kind_of Hash, th
-      assert th.has_key?(:properties)
-    end
-
-    should "Has dafault model" do
-      assert_equal ::TranslatableNews, News.send(:translatable_model_prepared, 'TranslatableNews')
-    end
-  end
-
-  context "Translatable model preparation" do
-    should "Accept constant" do
-      assert_equal ::TranslatableNews, News.send(:translatable_model_prepared, ::TranslatableNews)
-    end
-
-    should "Accept string" do
-      assert_equal ::TranslatableNews, News.send(:translatable_model_prepared, "TranslatableNews")
-    end
-
-    should "Accept symbol" do
-      assert_equal ::TranslatableNews, News.send(:translatable_model_prepared, :TranslatableNews)
-    end
+class ActiveRecordTest < Test::Unit::TestCase
+  teardown do
+    ::I18n.locale = ::I18n.default_locale
   end
 
   context "Instance" do
@@ -48,7 +22,49 @@ class TranslatableTest < Test::Unit::TestCase
       news = News.create
 
       assert news.persisted?
-      assert_nil TranslatableNews.last
+      assert_nil TranslatedNews.last
+    end
+
+    should "Change current translation" do
+      news = News.create :translations_attributes => [{:title => "Заголовок", :content => "Содержание", :locale => "ru"},
+        {:title => "Resent News", :content => "That is where the text goes", :locale => "en"}]
+
+      assert news.persisted?
+      assert_equal TranslatedNews.last, news.current_translation
+      assert_equal "en", news.current_translation.locale
+      
+      news.set_current_translation :ru
+      assert_equal TranslatedNews.first, news.current_translation
+      assert_equal "ru", news.current_translation.locale
+    end
+
+    should "Evaluate under translation" do
+      test_runner = self
+      news = News.create :translations_attributes => [{:title => "Заголовок", :content => "Содержание", :locale => "ru"},
+        {:title => "Resent News", :content => "That is where the text goes", :locale => "en"}]
+
+      assert_equal "en", news.current_translation.locale
+
+      news.with_locale(:ru) do
+        test_runner.assert_equal "ru", news.current_translation.locale
+      end
+      assert_equal "en", news.current_translation.locale
+
+      news.with_locale(:ru) do |n|
+        test_runner.assert_equal "ru", n.current_translation.locale
+      end
+      assert_equal "en", news.current_translation.locale
+    end
+
+    should "Shortcut translation" do
+      news = News.create :translations_attributes => [{:title => "Заголовок", :content => "Содержание", :locale => "ru"},
+        {:title => "Resent News", :content => "That is where the text goes", :locale => "en"}]
+
+      assert_equal TranslatedNews.last, news.t(:en)
+      assert_equal "en", news.t(:en).locale
+
+      assert_equal TranslatedNews.first, news.t(:ru)
+      assert_equal "ru", news.t(:ru).locale
     end
 
     should "Have no other translation" do
@@ -56,12 +72,23 @@ class TranslatableTest < Test::Unit::TestCase
 
       assert news.persisted?
 
-      t_news = TranslatableNews.last
+      t_news = TranslatedNews.last
       assert_equal [t_news], news.other_translations
       
       news.set_current_translation :ru
 
       assert_equal [], news.other_translations
+    end
+
+    should "Have other translation" do
+      news = News.create :translations_attributes => [{:title => "Заголовок", :content => "Содержание", :locale => "ru"},
+        {:title => "Resent News", :content => "That is where the text goes", :locale => "en"}]
+
+      assert news.persisted?
+      assert_equal [TranslatedNews.first], news.other_translations
+      
+      news.set_current_translation :ru
+      assert_equal [TranslatedNews.last], news.other_translations
     end
 
     should "Provide errors on creation" do
@@ -80,29 +107,29 @@ class TranslatableTest < Test::Unit::TestCase
 
   context "Translatable instance" do
     should "Respond to translatable methods" do
-      news = TranslatableNews.new
+      news = TranslatedNews.new
 
-      assert news.respond_to?(:title), "Title method is missing for TranslatableNews instance"
-      assert news.respond_to?(:content), "Content method is missing for TranslatableNews instance"
+      assert news.respond_to?(:title), "Title method is missing for TranslatedNews instance"
+      assert news.respond_to?(:content), "Content method is missing for TranslatedNews instance"
     end
 
     should "Respond to methods related to origin" do
-      news = TranslatableNews.new
+      news = TranslatedNews.new
 
-      assert news.respond_to?(:locale), "Locale method is missing for TranslatableNews instance"
-      assert news.respond_to?(:origin_id), "Origin methods is missing for TranslatableNews instance"
-      assert news.respond_to?(:origin), "Origin methods is missing for TranslatableNews instance"
+      assert news.respond_to?(:locale), "Locale method is missing for TranslatedNews instance"
+      assert news.respond_to?(:origin_id), "Origin methods is missing for TranslatedNews instance"
+      assert news.respond_to?(:origin), "Origin methods is missing for TranslatedNews instance"
     end
   end
 
   context "Creation with translation" do
     should "Assign to origin" do
       news = News.create
-      t_news = TranslatableNews.create :title => "Заголовок", :content => "Содержание", :locale => "ru", :origin_id => news.id
+      t_news = TranslatedNews.create :title => "Заголовок", :content => "Содержание", :locale => "ru", :origin_id => news.id
 
       assert t_news.persisted?
 
-      t_news = TranslatableNews.last
+      t_news = TranslatedNews.last
       assert_equal news.id, t_news.origin_id
       assert_equal "Заголовок", t_news.title
       assert_equal "Содержание", t_news.content
@@ -114,7 +141,7 @@ class TranslatableTest < Test::Unit::TestCase
 
       assert news.persisted?
 
-      t_news = TranslatableNews.last
+      t_news = TranslatedNews.last
       assert_equal news.id, t_news.origin_id.to_i
       assert_equal "Заголовок", t_news.title
       assert_equal "Содержание", t_news.content
@@ -127,13 +154,13 @@ class TranslatableTest < Test::Unit::TestCase
 
       assert news.persisted?
 
-      t_news = TranslatableNews.first
+      t_news = TranslatedNews.first
       assert_equal news.id, t_news.origin_id.to_i
       assert_equal "Заголовок", t_news.title
       assert_equal "Содержание", t_news.content
       assert_equal "ru", t_news.locale
 
-      t_news = TranslatableNews.last
+      t_news = TranslatedNews.last
       assert_equal news.id, t_news.origin_id.to_i
       assert_equal "Resent News", t_news.title
       assert_equal "That is where the text goes", t_news.content
@@ -207,40 +234,40 @@ class TranslatableTest < Test::Unit::TestCase
   end
 
   should "Define validations" do
-    post = Post.create :translations_attributes => [{:title => "Заголовок",:content => "Содержание", :locale => "ru"},
-      {:title => "Resent Post", :content => "That is where the text goes", :locale => "en"}]
+    post = Post.create :translations_attributes => [{:title => "Заголовок",:content => "Содержание", :language => "ru"},
+      {:title => "Resent Post", :content => "That is where the text goes", :language => "en"}]
     assert post.persisted?, "Message had errors: #{post.errors.inspect}"
 
-    post = Post.create :translations_attributes => [{:content => "Содержание", :locale => "ru"},
-      {:title => "Resent Post 2", :content => "That is where the text goes", :locale => "en"}]
+    post = Post.create :translations_attributes => [{:content => "Содержание", :language => "ru"},
+      {:title => "Resent Post 2", :content => "That is where the text goes", :language => "en"}]
     
     assert post.new_record?, "Message had errors: #{post.errors.full_messages.inspect}"
     assert_equal ["Translations title can't be blank"], post.errors.full_messages
 
-    post = Post.create :translations_attributes => [{:title => "Заголовок 2", :locale => "ru"},
-      {:title => "Resent Post 3", :content => "That is where the text goes", :locale => "en"}]
+    post = Post.create :translations_attributes => [{:title => "Заголовок 2", :language => "ru"},
+      {:title => "Resent Post 3", :content => "That is where the text goes", :language => "en"}]
 
     assert post.new_record?, "Message had errors: #{post.errors.full_messages.inspect}"
     assert_equal ["Translations content can't be blank"], post.errors.full_messages
 
-    post = Post.create :translations_attributes => [{:title => "Заголовок", :content => "Содержание", :locale => "ru"},
-      {:title => "Resent Post 3", :content => "That is where the text goes", :locale => "en"}]
+    post = Post.create :translations_attributes => [{:title => "Заголовок", :content => "Содержание", :language => "ru"},
+      {:title => "Resent Post 3", :content => "That is where the text goes", :language => "en"}]
 
     assert post.new_record?, "Message had errors: #{post.errors.full_messages.inspect}"
     assert_equal ["Translations title has already been taken"], post.errors.full_messages
   end
 
   def test_origin_is_owerwrittent
-    post = Post.create :translations_attributes => [{:title => "Заголовок",:content => "Содержание", :locale => "ru"},
-      {:title => "Resent Post", :content => "That is where the text goes", :locale => "en"}]
+    post = Post.create :translations_attributes => [{:title => "Заголовок",:content => "Содержание", :language => "ru"},
+      {:title => "Resent Post", :content => "That is where the text goes", :language => "en"}]
     assert post.persisted?, "Message had errors: #{post.errors.inspect}"
 
     assert_not_equal post.object_id, post.translations.first.post.object_id
   end
 
   should "Accept aliases for fileds" do
-    post = Post.create :translations_attributes => [{:title => "Заголовок",:content => "Содержание", :locale => "ru"},
-      {:title => "Resent Post", :content => "That is where the text goes", :locale => "en"}]
+    post = Post.create :translations_attributes => [{:title => "Заголовок",:content => "Содержание", :language => "ru"},
+      {:title => "Resent Post", :content => "That is where the text goes", :language => "en"}]
     assert post.persisted?, "Message had errors: #{post.errors.inspect}"
 
     assert_equal "Resent Post", post.translated_title
@@ -252,7 +279,7 @@ class TranslatableTest < Test::Unit::TestCase
 
   context "Mass assigment" do
     should "Be available to mass assigment by default" do
-      tp = TranslatableNews.new( :title => "Resent News", :content => "That is where the text goes", :locale => "en", :origin_id => 1)
+      tp = TranslatedNews.new( :title => "Resent News", :content => "That is where the text goes", :locale => "en", :origin_id => 1)
 
       assert_equal "Resent News", tp.title
       assert_equal "That is where the text goes", tp.content
@@ -261,21 +288,21 @@ class TranslatableTest < Test::Unit::TestCase
     end
 
     should "Protect internal fields on desire" do
-      tm = TranslatedMessage.new( :title => "Resent Post", :content => "That is where the text goes", :locale => "en", :message_id => 1)
+      tm = MessageTranslation.new( :title => "Resent Message", :content => "That is where the text goes", :locale => "en", :message_id => 1)
 
-      assert_equal "Resent Post", tm.title
+      assert_equal "Resent Message", tm.title
       assert_equal "That is where the text goes", tm.content
       assert_equal nil, tm.locale
-      assert_equal nil, tm.message_id
+      assert_equal nil, tm.origin_id
     end
 
     should "Allow multiple assigment rules" do
-      tm = TranslatedMessage.new( {:title => "Resent Post", :content => "That is where the text goes", :locale => "en", :message_id => 1}, :as => :editor)
+      tm = MessageTranslation.new( {:title => "Resent Message", :content => "That is where the text goes", :locale => "en", :message_id => 1}, :as => :editor)
 
-      assert_equal "Resent Post", tm.title
+      assert_equal "Resent Message", tm.title
       assert_equal "That is where the text goes", tm.content
       assert_equal "en", tm.locale
-      assert_equal nil, tm.message_id
+      assert_equal nil, tm.origin_id
     end
   end
 end

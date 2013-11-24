@@ -1,6 +1,3 @@
-require 'active_record'
-require 'translatable'
-
 class CreatePostsTables < ActiveRecord::Migration
   def up
     create_table(:writers, :force => true) do |t|
@@ -13,7 +10,7 @@ class CreatePostsTables < ActiveRecord::Migration
       t.string :title, :null => false
       t.string :content, :null => false
       t.integer :post_id, :null => false
-      t.string :locale, :null => false, :limit => 2
+      t.string :language, :null => false, :limit => 2
       t.integer :writer_id
 
       t.timestamps
@@ -40,7 +37,7 @@ class Author < ActiveRecord::Base
 end
 
 class TranslatedPost < ActiveRecord::Base
-  attr_accessible :title, :content
+  attr_accessible :title, :content, :language
 
   before_create :duplicate_writer_id
 
@@ -56,11 +53,12 @@ class Post < ActiveRecord::Base
   belongs_to  :writer
 
   translatable do
-    translatable  :title, :as => :translated_title, :presence => true, :uniqueness => true
-    translatable  :content, :presence => true
-    translatable_model 'TranslatedPost'
-    translatable_origin :post
-    translatable_attr_accessible
+    field  :title, :as => :translated_title, :presence => true, :uniqueness => true
+    field  :content, :presence => true
+    class_name 'TranslatedPost'
+    reflection_name :post
+    foreign_key :post_id
+    locale_key :language
   end
 
   attr_accessible :writer_id, :writer

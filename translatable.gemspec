@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "translatable"
-  s.version = "0.3.2"
+  s.version = "1.0.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["E-Max"]
-  s.date = "2013-11-07"
+  s.date = "2013-11-24"
   s.description = "This game was build to make whole proccess of working with translation for DM to be almost invisble. That was THE AIM."
   s.email = "max@studentify.nl"
   s.extra_rdoc_files = [
@@ -17,7 +17,8 @@ Gem::Specification.new do |s|
     "README.rdoc"
   ]
   s.files = [
-    ".document",
+    ".ruby-gemset",
+    ".ruby-version",
     ".travis.yml",
     "Gemfile",
     "Gemfile.lock",
@@ -28,10 +29,12 @@ Gem::Specification.new do |s|
     "lib/generators/translatable/model_generator.rb",
     "lib/generators/translatable/translation_generator.rb",
     "lib/translatable.rb",
-    "lib/translatable/active_record.rb",
+    "lib/translatable/base.rb",
     "lib/translatable/engine.rb",
     "lib/translatable/generator_helper.rb",
-    "test/cases/translatable_test.rb",
+    "lib/translatable/orm/active_record.rb",
+    "test/cases/active_record_test.rb",
+    "test/cases/base_test.rb",
     "test/generators/model_generator_test.rb",
     "test/generators/translation_generator_test.rb",
     "test/support/active_record.rb",

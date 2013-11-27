@@ -9,7 +9,7 @@ group :debug do
   gem "ruby-debug", :platform => :ruby_18
 end
 
-group :development do
+group :development, :test do
   gem "jeweler", "~> 1.8.0"
 end
 

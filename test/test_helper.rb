@@ -4,16 +4,6 @@ require "shoulda-context"
 require "i18n"
 
 begin
-  require 'simplecov'
-  SimpleCov.start do
-    add_filter "/test/"
-    add_filter "/vendor/"
-  end
-rescue LoadError
-  $stderr.puts "Simplecov is skipped"
-end
-
-begin
   Bundler.setup(:default, :development)
 rescue Bundler::BundlerError => e
   $stderr.puts e.message

@@ -16,9 +16,6 @@ end
 group :debug, :test do
   gem "yard"  
   gem "redcarpet"
-
-  gem "simplecov", "~> 0.7.1", :require => false, :platform => :ruby_19
-  gem "rcov", "~> 1.0.0", :require => false, :platform => :ruby_18
 end
 
 group :test do
@@ -27,7 +24,6 @@ group :test do
 
   gem "rails"
 
-  gem 'minitest'
   gem "test-unit"
   gem "shoulda"
 

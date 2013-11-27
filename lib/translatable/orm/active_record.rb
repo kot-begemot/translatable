@@ -120,7 +120,7 @@ module Translatable
       def with_locale(locale, &block)
         begin
           set_current_translation locale.to_sym
-          result = yield
+          result = block.arity > 0 ? block.call(self) : yield
         ensure
           update_current_translation
         end
@@ -130,7 +130,7 @@ module Translatable
       def t_set_current(locale = ::I18n.locale)
         @translatable_locale = locale.to_s
         translations.load_target unless translations.loaded?
-        @current_translation = t(locale)
+        @current_translation = t(@translatable_locale)
       end
       alias_method :set_current_translation, :t_set_current
 

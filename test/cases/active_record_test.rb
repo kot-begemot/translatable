@@ -16,6 +16,7 @@ class ActiveRecordTest < Test::Unit::TestCase
 
       assert news.respond_to?(:title), "title methods is missing for News instance"
       assert news.respond_to?(:content), "content methods is missing for News instance"
+      assert news.respond_to?(:locale), "locale methods is missing for News instance"
     end
 
     should "Creates without translation" do

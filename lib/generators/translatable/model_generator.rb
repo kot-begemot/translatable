@@ -27,17 +27,18 @@ module Translatable
       def generate_translatable_block
         block = "  translatable do"
         attributes.each do |attr|
-          block << "\n    translatable :#{attr.name}, :presence => true#, :uniqueness => true"
+          block << "\n    field :#{attr.name}, :presence => true#, :uniqueness => true"
         end
         block << (options[:translated_model].nil? ?
-            "\n    #translatable_model 'Translated#{class_name}'" :
-            "\n    translatable_model '#{options[:translated_model]}'")
+            "\n    #class_name 'Translated#{class_name}'" :
+            "\n    class_name '#{options[:translated_model]}'")
         block << (options[:origin].nil? ?
-            "\n    #translatable_origin :#{singular_table_name}" :
-            "\n    translatable_origin :#{options[:origin]}")
+            "\n    #reflection_name :#{singular_table_name}" :
+            "\n    reflection_name :#{options[:origin]}")
+        block << "\n    #foreign_key :origin_id" 
         block << (options[:locale].nil? ?
-            "\n    #translatable_locale :locale" :
-            "\n    translatable_locale :#{options[:locale]}")
+            "\n    #locale_key :locale" :
+            "\n    locale_key :#{options[:locale]}")
         block << "\n  end\n"
       end
     end

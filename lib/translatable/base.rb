@@ -1,6 +1,6 @@
 module Translatable
   class Base
-    attr_reader :fields, :translation_model, :origin_key, :origin_reflection_name, :locale_column
+    attr_reader :fields, :translation_model, :origin_key, :origin_reflection_name
 
     def initialize origin_model
       @origin_model = origin_model
@@ -8,7 +8,7 @@ module Translatable
 
     # API 
     def field(*args)
-      (@fields ||= []) << args
+      (@fields ||= []) << set_mapping(*args)
     end
 
     def class_name(model_name)
@@ -23,7 +23,8 @@ module Translatable
       @origin_reflection_name = reflection.to_sym
     end
 
-    def locale_key(key_name)
+    def locale_key(key_name, opts = {})
+      set_mapping key_name, opts
       @locale_column = key_name.to_sym
     end
 
@@ -46,7 +47,20 @@ module Translatable
       @locale_column || (@locale_column = :locale)
     end
 
+    def mapping
+      unless @mapping_defined
+        (@mapping ||= {})[locale_column] ||= :locale
+        @mapping_defined = true
+      end
+      @mapping || {}
+    end
+
     protected
+
+    def set_mapping attribute, options = {}
+      (@mapping ||= {})[attribute.to_sym] = options.delete(:as) || attribute rescue attribute
+      return attribute, options
+    end
 
     def origin_class_name
       @origin_model.name

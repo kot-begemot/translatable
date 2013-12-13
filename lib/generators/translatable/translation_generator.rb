@@ -7,7 +7,7 @@ module Translatable
 
       desc "Creates ActiveRecord for translation"
 
-      class_option :prefix, :type => :string, :default => "translatable", :desc => "Specifies the prefix to used tof translation dealer (Default: translatable)"
+      class_option :prefix, :type => :string, :default => "translated", :desc => "Specifies the prefix to used tof translation dealer (Default: translatable)"
       class_option :origin, :type => :string, :default => "origin",       :desc => "Specifies the association name to be use for origin (Default: origin)"
       class_option :locale, :type => :string, :default => "locale",       :desc => "Specifies the column to be use for locale (Default: locale)"
 

@@ -58,6 +58,7 @@ module Translatable
       @translatable_base.instance_eval(&block)
       t_register_origin
       t_register_translations
+      t_register_locale
     end
 
     module ClassMethods
@@ -74,16 +75,6 @@ module Translatable
         
         accepts_nested_attributes_for :translations
         attr_accessible :translations_attributes
-
-        @translatable_base.fields.each do |p| 
-          access_name = p[1].delete(:as) || p.first rescue p.first
-
-          self.instance_eval do
-            define_method access_name do 
-              current_translation.try(p.first)
-            end
-          end
-        end
       end
 
       def t_register_translations
@@ -98,6 +89,16 @@ module Translatable
 
           t.fields.each do |f|
             t.t_model.validates(f.first, f.last) unless f[1].blank?
+          end
+        end
+      end
+
+      def t_register_locale
+        @translatable_base.mapping.each_pair do |attr, attr_alias| 
+          self.instance_eval do
+            define_method attr_alias do 
+              current_translation.try(attr)
+            end
           end
         end
       end

@@ -16,14 +16,29 @@ class BaseTest < Test::Unit::TestCase
     should "Simple field" do
       @base.field :title
 
-      assert_equal [[:title]], @base.fields
+      assert_equal [[:title, {}]], @base.fields
     end
 
     should "Several fields" do
       @base.field :title
       @base.field :content, :presence => true
 
-      assert_equal [[:title], [:content, {:presence => true}]], @base.fields
+      assert_equal [[:title, {}], [:content, {:presence => true}]], @base.fields
+    end
+
+    should "Have mapping" do
+      @base.field :title
+      @base.field :content, :as => :paper_content, :presence => true
+
+      assert_equal({:title => :title, :content => :paper_content, :locale => :locale}, @base.mapping)
+    end
+
+    should "Have mapping (with locale)" do
+      @base.field :title
+      @base.field :content, :as => :paper_content, :presence => true
+      @base.locale_key :locale, :as => :language
+
+      assert_equal({:title => :title, :content => :paper_content, :locale => :language}, @base.mapping)
     end
 
     should "Translation model (as class)" do

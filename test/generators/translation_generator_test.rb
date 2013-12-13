@@ -11,18 +11,18 @@ class TranslationGeneratorTest < Rails::Generators::TestCase
 
   should "Create required files (default)" do
     run_generator %w(article title:string content:string)
-    assert_file "app/models/translatable_article.rb", <<CONTENT
-class TranslatableArticle < ActiveRecord::Base
+    assert_file "app/models/translated_article.rb", <<CONTENT
+class TranslatedArticle < ActiveRecord::Base
   # This class deals purely with translations themselves. Hence, any edition of
   # should be avoided.
   # In later gem version its existance might not be necessary.
   #attr_protected :origin_id, :locale
 end
 CONTENT
-    assert_migration "db/migrate/create_translatable_articles.rb", <<CONTENT
-class CreateTranslatableArticles < ActiveRecord::Migration
+    assert_migration "db/migrate/create_translated_articles.rb", <<CONTENT
+class CreateTranslatedArticles < ActiveRecord::Migration
   def change
-    create_table :translatable_articles do |t|
+    create_table :translated_articles do |t|
       t.string :title
       t.string :content
       t.integer :origin_id

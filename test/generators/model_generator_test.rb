@@ -14,11 +14,12 @@ class ModelGeneratorTest < Rails::Generators::TestCase
     assert_file "app/models/article.rb", <<CONTENT
 class Article < ActiveRecord::Base
   translatable do
-    translatable :title, :presence => true#, :uniqueness => true
-    translatable :content, :presence => true#, :uniqueness => true
-    #translatable_model 'TranslatedArticle'
-    #translatable_origin :article
-    #translatable_locale :locale
+    field :title, :presence => true#, :uniqueness => true
+    field :content, :presence => true#, :uniqueness => true
+    #class_name 'TranslatedArticle'
+    #reflection_name :article
+    #foreign_key :origin_id
+    #locale_key :locale
   end
 end
 CONTENT
@@ -39,11 +40,12 @@ CONTENT
     assert_file "app/models/article.rb", <<CONTENT
 class Article < ActiveRecord::Base
   translatable do
-    translatable :title, :presence => true#, :uniqueness => true
-    translatable :content, :presence => true#, :uniqueness => true
-    translatable_model 'ArticleTranslation'
-    translatable_origin :post
-    translatable_locale :language
+    field :title, :presence => true#, :uniqueness => true
+    field :content, :presence => true#, :uniqueness => true
+    class_name 'ArticleTranslation'
+    reflection_name :post
+    #foreign_key :origin_id
+    locale_key :language
   end
 end
 CONTENT
@@ -66,11 +68,12 @@ CONTENT
     assert_file "app/models/article.rb", <<CONTENT
 class Article < ActiveRecord::Base
   translatable do
-    translatable :title, :presence => true#, :uniqueness => true
-    translatable :content, :presence => true#, :uniqueness => true
-    #translatable_model 'TranslatedArticle'
-    #translatable_origin :article
-    #translatable_locale :locale
+    field :title, :presence => true#, :uniqueness => true
+    field :content, :presence => true#, :uniqueness => true
+    #class_name 'TranslatedArticle'
+    #reflection_name :article
+    #foreign_key :origin_id
+    #locale_key :locale
   end
   attr_accessor :created_at, :updated_at
 end

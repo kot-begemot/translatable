@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "translatable"
-  s.version = "1.0.0"
+  s.version = "1.0.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["E-Max"]
-  s.date = "2013-11-24"
+  s.date = "2013-12-13"
   s.description = "This game was build to make whole proccess of working with translation for DM to be almost invisble. That was THE AIM."
   s.email = "max@studentify.nl"
   s.extra_rdoc_files = [

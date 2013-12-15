@@ -70,10 +70,11 @@ module Translatable
       def t_register_origin
         has_many :translations, 
           :class_name => @translatable_base.translation_model.to_s, 
-          :foreign_key => @translatable_base.origin_key
+          :foreign_key => @translatable_base.origin_key,
+          :dependent => :destroy
 
         has_one :current_translation, 
-          :conditions => { @translatable_base.locale_column => ::I18n.locale },
+          :conditions => proc { ["#{t_locale_column} = ?", ::I18n.locale] },
           :class_name => @translatable_base.translation_model.to_s, 
           :foreign_key => @translatable_base.origin_key,
           :inverse_of =>  @translatable_base.or_name

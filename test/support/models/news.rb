@@ -51,5 +51,7 @@ class News < ActiveRecord::Base
     field  :content
   end
 
+  accepts_nested_attributes_for :translations, :current_translation
+  attr_accessible :translations_attributes, :current_translation_attributes
   attr_accessible :author_id, :author
 end

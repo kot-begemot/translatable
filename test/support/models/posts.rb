@@ -61,5 +61,7 @@ class Post < ActiveRecord::Base
     locale_key :language
   end
 
+  accepts_nested_attributes_for :translations, :current_translation
+  attr_accessible :translations_attributes, :current_translation_attributes
   attr_accessible :writer_id, :writer
 end

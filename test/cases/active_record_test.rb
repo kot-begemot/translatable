@@ -186,7 +186,7 @@ class ActiveRecordTest < Test::Unit::TestCase
 
       assert news.persisted?
 
-      ::I18n.locale = :ru
+      news.set_current_translation :ru
 
       assert_equal "Заголовок", news.title
       assert_equal "Содержание", news.content

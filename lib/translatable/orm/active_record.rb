@@ -70,11 +70,13 @@ module Translatable
       def t_register_origin
         has_many :translations, 
           :class_name => @translatable_base.translation_model.to_s, 
+          :foreign_key => @translatable_base.origin_key
+
+        has_one :current_translation, 
+          :conditions => { @translatable_base.locale_column => ::I18n.locale },
+          :class_name => @translatable_base.translation_model.to_s, 
           :foreign_key => @translatable_base.origin_key,
           :inverse_of =>  @translatable_base.or_name
-        
-        accepts_nested_attributes_for :translations
-        attr_accessible :translations_attributes
       end
 
       def t_register_translations
@@ -85,7 +87,7 @@ module Translatable
             |record| record.public_send(t.locale_column).blank?
           }
 
-          t.t_model.belongs_to t.or_name, :class_name => self.name, :inverse_of => :translations
+          t.t_model.belongs_to t.or_name, :class_name => self.name, :inverse_of => :current_translation
 
           t.fields.each do |f|
             t.t_model.validates(f.first, f.last) unless f[1].blank?
@@ -105,11 +107,6 @@ module Translatable
     end
 
     module InstanceMethods
-      def current_translation
-        update_current_translation unless @translatable_locale
-        @current_translation
-      end
-
       def other_translations
         translations - [current_translation]
       end
@@ -123,23 +120,18 @@ module Translatable
           set_current_translation locale.to_sym
           result = block.arity > 0 ? block.call(self) : yield
         ensure
-          update_current_translation
+          set_current_translation
         end
         result
       end
 
       def t_set_current(locale = ::I18n.locale)
-        @translatable_locale = locale.to_s
         translations.load_target unless translations.loaded?
-        @current_translation = t(@translatable_locale)
+        association(:current_translation).target = t(locale.to_s)
       end
       alias_method :set_current_translation, :t_set_current
 
       protected
-
-      def update_current_translation
-        t_set_current(@translatable_locale = ::I18n.locale.to_s)
-      end
 
       def t_locale_column
         self.class.instance_variable_get(:@translatable_base).locale_column

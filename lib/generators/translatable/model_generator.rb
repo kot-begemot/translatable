@@ -40,6 +40,9 @@ module Translatable
             "\n    #locale_key :locale" :
             "\n    locale_key :#{options[:locale]}")
         block << "\n  end\n"
+
+        block << "\n  #accepts_nested_attributes_for :translations, :current_translation"
+        block << "\n  #attr_accessible :translations_attributes, :current_translation_attributes\n"
       end
     end
   end

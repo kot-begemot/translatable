@@ -21,6 +21,9 @@ class Article < ActiveRecord::Base
     #foreign_key :origin_id
     #locale_key :locale
   end
+
+  #accepts_nested_attributes_for :translations, :current_translation
+  #attr_accessible :translations_attributes, :current_translation_attributes
 end
 CONTENT
     assert_migration "db/migrate/create_articles.rb", <<CONTENT
@@ -47,6 +50,9 @@ class Article < ActiveRecord::Base
     #foreign_key :origin_id
     locale_key :language
   end
+
+  #accepts_nested_attributes_for :translations, :current_translation
+  #attr_accessible :translations_attributes, :current_translation_attributes
 end
 CONTENT
     assert_migration "db/migrate/create_articles.rb", <<CONTENT
@@ -75,6 +81,9 @@ class Article < ActiveRecord::Base
     #foreign_key :origin_id
     #locale_key :locale
   end
+
+  #accepts_nested_attributes_for :translations, :current_translation
+  #attr_accessible :translations_attributes, :current_translation_attributes
   attr_accessor :created_at, :updated_at
 end
 CONTENT

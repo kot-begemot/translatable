@@ -9,7 +9,7 @@ module Translatable
   #     validates :name, :presence => true
   #   end
   #
-  #   class TranslatableNews < ActiveRecord::Base  #
+  #   class TranslatedNews < ActiveRecord::Base  #
   #     attr_accessible :title, :content
   #   end
   #
@@ -18,12 +18,14 @@ module Translatable
   #     belongs_to  :author
   #
   #     translatable do
-  #       attribute  :title, :presence => true, :uniqueness => true
-  #       attribute  :content, :presence => true
-  #       model "TranslatedNews"
+  #       field  :title, :presence => true, :uniqueness => true
+  #       field  :content, :presence => true
+  #       class_name "TranslatedNews"
   #       foreign_key :origin_id
   #     end
   #
+  #     accepts_nested_attributes_for :translations, :current_translation
+  #     attr_accessible :translations_attributes, :current_translation_attributes
   #     attr_accessible :author_id, :author
   #   end
   #
@@ -35,15 +37,15 @@ module Translatable
   #   news.content
   #   # => "That is where the text goes"
   #
-  #   ::I18n.locale = "ru"
+  #   news.set_current_translation :ru
   #   news.content
   #   # => "Сюди идет текст"
   #
-  #   ::I18n.locale = "de"
+  #   news.set_current_translation :de
   #   news.content
   #   # => nil
   #
-  #   ::I18n.locale = ::I18n.default_locale
+  #   news.set_current_translation
   #   news.content
   #   # => "That is where the text goes"
   #

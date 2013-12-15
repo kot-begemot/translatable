@@ -27,57 +27,48 @@ Check out the examples below.
 Just define inside of your model `translatable` with block.
 Block accepts following methods:
 
-  translatable *args
+  field *args
     Params:
       first - Here should be specified an attribute that will be translated.
       second - Define here a hash that will be later provided for validation to model.
 
       This method may be called multiple times.
     Examples:
-      translatable :title,   :presence => true, :uniqueness => true
-      translatable :content, :presence => true
-      translatable :notes
+      field :title,   :presence => true, :uniqueness => true
+      field :content, :presence => true
+      field :notes
 
-  translatable_model model_name
+  class_name model_name
     Params:
       model_name - Define the model name here if it is different from following "Translatable<CURRENT_MODEL>".
         For News model, TranslatableNews will be used as the one that keeping translations. It can be defined 
         in a three ways: as constant, string or symbol.
     Examples:
-      translatable_model TranslatedNews
+      class_name "TranslatedNews"
       OR
-      translatable_model "TranslatedNews"
-      OR
-      translatable_model :TranslatedNews
+      class_name :TranslatedNews
 
-  translatable_origin origin_key
+  foreign_key origin_key
     Params:
       origin_key - This key will be used to define the the relations for translations model.
       By default it will be :origin. Translations model should also have such attribute defined.
 
       This value will also be used for validation, as its presence is compulsory for translations model.
     Examples:
-      translatable_origin :message
+      foreign_key :message
       OR
-      translatable_origin :post
+      foreign_key :post
 
-  translatable_locale locale_attr
+  locale_key locale_attr
     Params:
       locale_attr - This key will be used to define the attribute that is keeping the locale of the translation.
       By default it will be :locale. Translations model should also have such attribute defined.
 
       This value will also be used for validation, as its presence is compulsory for translations model.
     Examples:
-      translatable_locale :language
+      locale_key :language
       OR
-      translatable_locale :lang
-
-  translatable_attr_accessible
-  translatable_attr_protected
-    If this line is set then the attributes :locale and :origin will be allowed or protected
-    from for mass-assigment.
-
-    Note: Note sure that this is the best implementation. Would appreciate any better ideas.
+      locale_key :lang
 
 == Now to create the translations?
 
@@ -99,7 +90,7 @@ Migrations:
           t.timestamps
         end
 
-        create_table(:translatable_news) do |t|
+        create_table(:translated_news) do |t|
           t.string :title, :null => false
           t.string :content, :null => false
           t.integer :origin_id, :null => false
@@ -124,26 +115,19 @@ Migrations:
 
 Models:
 
-    class Author < ActiveRecord::Base
-      validates :name, :presence => true
-    end
-
-    class TranslatableNews < ActiveRecord::Base
-      attr_accessible :title, :content
-    end
-
     class News < ActiveRecord::Base
-
+ 
       belongs_to  :author
-
+ 
       translatable do
-        translatable  :title, :presence => true, :uniqueness => true
-        translatable  :content, :presence => true
-        translatable_model "TranslatedNews"
-        translatable_origin :origin_id
-        translatable_attr_accessible
+        field  :title, :presence => true, :uniqueness => true
+        field  :content, :presence => true
+        class_name "TranslatedNews"
+        foreign_key :origin_id
       end
-
+ 
+      accepts_nested_attributes_for :translations, :current_translation
+      attr_accessible :translations_attributes, :current_translation_attributes
       attr_accessible :author_id, :author
     end
 
@@ -151,19 +135,19 @@ An example of application:
 
     news = News.create :translations_attributes => [{title: "Resent News", content: "That is where the text goes", locale: "en"}]
     news.translations.create title: "Заголовок", content: "Содержание",locale: "ru"
-
+ 
     news.content
     # => "That is where the text goes"
-
-    ::I18n.locale = "ru"
+ 
+    news.set_current_translation :ru
     news.content
     # => "Сюди идет текст"
-
-    ::I18n.locale = "de"
+ 
+    news.set_current_translation :de
     news.content
     # => nil
-
-    ::I18n.locale = ::I18n.default_locale
+ 
+    news.set_current_translation
     news.content
     # => "That is where the text goes"
 

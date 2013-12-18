@@ -5,13 +5,13 @@ require 'support/models/news'
 require 'support/models/posts'
 require 'support/models/messages'
 
-class ActiveRecordTest < Test::Unit::TestCase
+class InstanceActiveRecordTest < Test::Unit::TestCase
   teardown do
     ::I18n.locale = ::I18n.default_locale
   end
 
-  context "Instance" do
-    should "Respond to translatable methods" do
+  #context "Instance" do
+    test "should Respond to translatable methods" do
       news = News.new
 
       assert news.respond_to?(:title), "title methods is missing for News instance"
@@ -19,14 +19,14 @@ class ActiveRecordTest < Test::Unit::TestCase
       assert news.respond_to?(:locale), "locale methods is missing for News instance"
     end
 
-    should "Creates without translation" do
+    test "should Creates without translation" do
       news = News.create
 
       assert news.persisted?
       assert_nil TranslatedNews.last
     end
 
-    should "Change current translation" do
+    test "should Change current translation" do
       news = News.create :translations_attributes => [{:title => "Заголовок", :content => "Содержание", :locale => "ru"},
         {:title => "Resent News", :content => "That is where the text goes", :locale => "en"}]
 
@@ -39,7 +39,7 @@ class ActiveRecordTest < Test::Unit::TestCase
       assert_equal "ru", news.current_translation.locale
     end
 
-    should "Evaluate under translation" do
+    test "should Evaluate under translation" do
       test_runner = self
       news = News.create :translations_attributes => [{:title => "Заголовок", :content => "Содержание", :locale => "ru"},
         {:title => "Resent News", :content => "That is where the text goes", :locale => "en"}]
@@ -57,7 +57,7 @@ class ActiveRecordTest < Test::Unit::TestCase
       assert_equal "en", news.current_translation.locale
     end
 
-    should "Shortcut translation" do
+    test "should Shortcut translation" do
       news = News.create :translations_attributes => [{:title => "Заголовок", :content => "Содержание", :locale => "ru"},
         {:title => "Resent News", :content => "That is where the text goes", :locale => "en"}]
 
@@ -68,7 +68,7 @@ class ActiveRecordTest < Test::Unit::TestCase
       assert_equal "ru", news.t(:ru).locale
     end
 
-    should "Have no other translation" do
+    test "should Have no other translation" do
       news = News.create :translations_attributes => [{ :title => "Заголовок", :content => "Содержание", :locale => "ru"}]
 
       assert news.persisted?
@@ -81,7 +81,7 @@ class ActiveRecordTest < Test::Unit::TestCase
       assert_equal [], news.other_translations
     end
 
-    should "Have other translation" do
+    test "should Have other translation" do
       news = News.create :translations_attributes => [{:title => "Заголовок", :content => "Содержание", :locale => "ru"},
         {:title => "Resent News", :content => "That is where the text goes", :locale => "en"}]
 
@@ -92,7 +92,7 @@ class ActiveRecordTest < Test::Unit::TestCase
       assert_equal [TranslatedNews.last], news.other_translations
     end
 
-    should "Provide errors on creation" do
+    test "should Provide errors on creation" do
       news = News.create :translations_attributes => [{:title => "Заголовок", :content => "Содержание", :locale => "ru"},
         {:title => "Resent News", :content => "That is where the text goes", :locale => ""}]
 
@@ -104,27 +104,39 @@ class ActiveRecordTest < Test::Unit::TestCase
         assert t.new_record?
       end
     end
+  #end
+end
+
+class TranslatableInstanceActiveRecordTest < Test::Unit::TestCase
+  teardown do
+    ::I18n.locale = ::I18n.default_locale
   end
 
-  context "Translatable instance" do
-    should "Respond to translatable methods" do
+  #context "Translatable instance" do
+    test "should Respond to translatable methods" do
       news = TranslatedNews.new
 
       assert news.respond_to?(:title), "Title method is missing for TranslatedNews instance"
       assert news.respond_to?(:content), "Content method is missing for TranslatedNews instance"
     end
 
-    should "Respond to methods related to origin" do
+    test "should Respond to methods related to origin" do
       news = TranslatedNews.new
 
       assert news.respond_to?(:locale), "Locale method is missing for TranslatedNews instance"
       assert news.respond_to?(:origin_id), "Origin methods is missing for TranslatedNews instance"
       assert news.respond_to?(:origin), "Origin methods is missing for TranslatedNews instance"
     end
-  end
+  #end
+end
 
-  context "Creation with translation" do
-    should "Assign to origin" do
+class CreationActiveRecordTest < Test::Unit::TestCase
+  teardown do
+    ::I18n.locale = ::I18n.default_locale
+  end
+  
+  #context "Creation with translation" do
+    test "should Assign to origin" do
       news = News.create
       t_news = TranslatedNews.create :title => "Заголовок", :content => "Содержание", :locale => "ru", :origin_id => news.id
 
@@ -137,7 +149,7 @@ class ActiveRecordTest < Test::Unit::TestCase
       assert_equal "ru", t_news.locale
     end
 
-    should "Create translation on origin creation" do
+    test "should Create translation on origin creation" do
       news = News.create :translations_attributes => [{ :title => "Заголовок", :content => "Содержание", :locale => "ru"}]
 
       assert news.persisted?
@@ -149,7 +161,7 @@ class ActiveRecordTest < Test::Unit::TestCase
       assert_equal "ru", t_news.locale
     end
 
-    should "Create multiple translations" do
+    test "should Create multiple translations" do
       news = News.create :translations_attributes => [{ :title => "Заголовок", :content => "Содержание", :locale => "ru"},
         {:title => "Resent News", :content => "That is where the text goes", :locale => "en"}]
 
@@ -167,10 +179,16 @@ class ActiveRecordTest < Test::Unit::TestCase
       assert_equal "That is where the text goes", t_news.content
       assert_equal "en", t_news.locale
     end
+  #end
+end
+
+class CurrentTranslationActiveRecordTest < Test::Unit::TestCase
+  teardown do
+    ::I18n.locale = ::I18n.default_locale
   end
 
-  context "Current translation" do
-    should "Set default translation" do
+  #context "Current translation" do
+    test "should Set default translation" do
       news = News.create :translations_attributes => [{:title => "Заголовок", :content => "Содержание", :locale => "ru"},
         {:title => "Resent News", :content => "That is where the text goes", :locale => "en"}]
 
@@ -180,7 +198,7 @@ class ActiveRecordTest < Test::Unit::TestCase
       assert_equal "That is where the text goes", news.content
     end
     
-    should "Been set equal to current locale" do
+    test "should Been set equal to current locale" do
       news = News.create :translations_attributes => [{:title => "Заголовок", :content => "Содержание", :locale => "ru"},
         {:title => "Resent News", :content => "That is where the text goes", :locale => "en"}]
 
@@ -192,7 +210,7 @@ class ActiveRecordTest < Test::Unit::TestCase
       assert_equal "Содержание", news.content
     end
     
-    should "Not been set if unavailable" do
+    test "should Not been set if unavailable" do
       news = News.create :translations_attributes => [{:title => "Заголовок", :content => "Содержание", :locale => "ru"},
         {:title => "Resent News", :content => "That is where the text goes", :locale => "en"}]
 
@@ -203,7 +221,7 @@ class ActiveRecordTest < Test::Unit::TestCase
       assert_nil news.content
     end
 
-    should "Be switched on locale switching" do
+    test "should Be switched on locale switching" do
       news = News.create :translations_attributes => [{:title => "Resent News", :content => "That is where the text goes", :locale => "en"}]
 
       assert news.persisted?
@@ -221,9 +239,9 @@ class ActiveRecordTest < Test::Unit::TestCase
       assert_equal "Заголовок", news.title
       assert_equal "Содержание", news.content
     end
-  end
+  #end
 
-  should "Add translation to existing record" do
+  test "should Add translation to existing record" do
     news = News.create :translations_attributes => [{:title => "Resent News", :content => "That is where the text goes", :locale => "en"}]
 
     assert news.persisted?
@@ -234,7 +252,7 @@ class ActiveRecordTest < Test::Unit::TestCase
     assert t_news.persisted?
   end
 
-  should "Define validations" do
+  test "should Define validations" do
     post = Post.create :translations_attributes => [{:title => "Заголовок",:content => "Содержание", :language => "ru"},
       {:title => "Resent Post", :content => "That is where the text goes", :language => "en"}]
     assert post.persisted?, "Message had errors: #{post.errors.inspect}"
@@ -266,7 +284,7 @@ class ActiveRecordTest < Test::Unit::TestCase
     assert_not_equal post.object_id, post.translations.first.post.object_id
   end
 
-  should "Accept aliases for fileds" do
+  test "should Accept aliases for fileds" do
     post = Post.create :translations_attributes => [{:title => "Заголовок",:content => "Содержание", :language => "ru"},
       {:title => "Resent Post", :content => "That is where the text goes", :language => "en"}]
     assert post.persisted?, "Message had errors: #{post.errors.inspect}"
@@ -277,9 +295,15 @@ class ActiveRecordTest < Test::Unit::TestCase
 
     assert_equal "Заголовок", post.translated_title
   end
+end
 
-  context "Mass assigment" do
-    should "Be available to mass assigment by default" do
+class MassAssigmentActiveRecordTest < Test::Unit::TestCase
+  teardown do
+    ::I18n.locale = ::I18n.default_locale
+  end
+
+  #context "Mass assigment" do
+    test "should Be available to mass assigment by default" do
       tp = TranslatedNews.new( :title => "Resent News", :content => "That is where the text goes", :locale => "en", :origin_id => 1)
 
       assert_equal "Resent News", tp.title
@@ -288,7 +312,7 @@ class ActiveRecordTest < Test::Unit::TestCase
       assert_equal 1, tp.origin_id
     end
 
-    should "Protect internal fields on desire" do
+    test "should Protect internal fields on desire" do
       tm = MessageTranslation.new( :title => "Resent Message", :content => "That is where the text goes", :locale => "en", :message_id => 1)
 
       assert_equal "Resent Message", tm.title
@@ -297,7 +321,7 @@ class ActiveRecordTest < Test::Unit::TestCase
       assert_equal nil, tm.origin_id
     end
 
-    should "Allow multiple assigment rules" do
+    test "should Allow multiple assigment rules" do
       tm = MessageTranslation.new( {:title => "Resent Message", :content => "That is where the text goes", :locale => "en", :message_id => 1}, :as => :editor)
 
       assert_equal "Resent Message", tm.title
@@ -305,5 +329,5 @@ class ActiveRecordTest < Test::Unit::TestCase
       assert_equal "en", tm.locale
       assert_equal nil, tm.origin_id
     end
-  end
+  #end
 end

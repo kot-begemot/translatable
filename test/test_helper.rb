@@ -3,6 +3,8 @@ require 'test/unit'
 require "shoulda-context"
 require "i18n"
 
+require "protected_attributes"
+
 begin
   Bundler.setup(:default, :development)
 rescue Bundler::BundlerError => e

@@ -75,11 +75,12 @@ module Translatable
           :foreign_key => @translatable_base.origin_key,
           :dependent => :destroy
 
-        has_one :current_translation, 
-          :conditions => proc { ["#{t_locale_column} = ?", ::I18n.locale] },
-          :class_name => @translatable_base.translation_model.to_s, 
-          :foreign_key => @translatable_base.origin_key,
-          :inverse_of =>  @translatable_base.or_name
+        class_eval <<-EOS
+          has_one :current_translation, -> { where("#{reflection_locale}" => ::I18n.locale) }, 
+            :class_name => @translatable_base.translation_model.to_s, 
+            :foreign_key => @translatable_base.origin_key,
+            :inverse_of =>  @translatable_base.or_name
+        EOS
       end
 
       def t_register_translations
@@ -106,6 +107,10 @@ module Translatable
             end
           end
         end
+      end
+
+      def reflection_locale
+        @translatable_base.locale_column
       end
     end
 
@@ -137,7 +142,7 @@ module Translatable
       protected
 
       def t_locale_column
-        self.class.instance_variable_get(:@translatable_base).locale_column
+        self.class.send(:reflection_locale)
       end
     end
   end

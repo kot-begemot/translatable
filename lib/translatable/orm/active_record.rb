@@ -73,13 +73,13 @@ module Translatable
         has_many :translations, 
           :class_name => @translatable_base.translation_model.to_s, 
           :foreign_key => @translatable_base.origin_key,
+          :inverse_of =>  @translatable_base.or_name,
           :dependent => :destroy
 
         class_eval <<-EOS
           has_one :current_translation, -> { where("#{reflection_locale}" => ::I18n.locale) }, 
             :class_name => @translatable_base.translation_model.to_s, 
-            :foreign_key => @translatable_base.origin_key,
-            :inverse_of =>  @translatable_base.or_name
+            :foreign_key => @translatable_base.origin_key
         EOS
       end
 
@@ -91,7 +91,7 @@ module Translatable
             |record| record.public_send(t.locale_column).blank?
           }
 
-          t.t_model.belongs_to t.or_name, :class_name => self.name, :inverse_of => :current_translation
+          t.t_model.belongs_to t.or_name, :class_name => self.name, :inverse_of => :translations
 
           t.fields.each do |f|
             t.t_model.validates(f.first, f.last) unless f[1].blank?

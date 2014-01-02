@@ -281,7 +281,7 @@ class CurrentTranslationActiveRecordTest < Test::Unit::TestCase
       {:title => "Resent Post", :content => "That is where the text goes", :language => "en"}]
     assert post.persisted?, "Message had errors: #{post.errors.inspect}"
 
-    assert_not_equal post.object_id, post.translations.first.post.object_id
+    assert_equal post.object_id, post.translations.first.post.object_id
   end
 
   test "should Accept aliases for fileds" do

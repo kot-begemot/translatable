@@ -78,7 +78,7 @@ class InstanceActiveRecordTest < Test::Unit::TestCase
       
       news.set_current_translation :ru
 
-      assert_equal [], news.other_translations
+      assert_equal [], news.other_translations(true)
     end
 
     test "should Have other translation" do
@@ -89,7 +89,7 @@ class InstanceActiveRecordTest < Test::Unit::TestCase
       assert_equal [TranslatedNews.first], news.other_translations
       
       news.set_current_translation :ru
-      assert_equal [TranslatedNews.last], news.other_translations
+      assert_equal [TranslatedNews.last], news.other_translations(true)
     end
 
     test "should Provide errors on creation" do

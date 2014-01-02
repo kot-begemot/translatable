@@ -115,8 +115,15 @@ module Translatable
     end
 
     module InstanceMethods
-      def other_translations
-        translations - [current_translation]
+      def other_translations(reload = false)
+        @other_translations = nil if reload
+        @other_translations ||= begin 
+          unless association(:current_translation).loaded?
+            translations.to_a.reject {|t|t.send(t_locale_column) == ::I18n.locale.to_s}
+          else
+            translations - [current_translation]
+          end
+        end
       end
 
       def t(locale)
